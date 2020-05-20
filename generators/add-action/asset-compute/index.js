@@ -24,7 +24,7 @@ class AssetComputeGenerator extends ActionGenerator {
 
   async prompting () {
     this.props.actionName = await this.promptForActionName('example of a custom worker for the Adobe Asset Compute service', 'example')
-    this.props.actionDestPath = this.destinationPath(`worker-${this.props.actionName}.js`)
+    // this.props.actionDestPath = this.destinationPath(`worker-${this.props.actionName}.js`)
   }
 
   writing () {
