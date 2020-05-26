@@ -36,17 +36,19 @@ class AssetComputeGenerator extends ActionGenerator {
         '@adobe/asset-compute-sdk': '^1.0.2'
       },
       devDependencies: {
-        '@adobe/eslint-config-asset-compute': '^1.2.0'
+        '@adobe/aio-cli-plugin-asset-compute': '^1.0.1'
       },
       dotenvStub: {
-        label: 'please provide the following environment variables for the Asset Compute devtool',
+        label: 'please provide the following environment variables for the Asset Compute devtool. You can use AWS or Azure, not both:',
         vars: [
-          'AIO_INTEGRATION_FILE_PATH',
-          'ASSET_COMPUTE_URL',
+          'ASSET_COMPUTE_INTEGRATION_FILE_PATH',
           'S3_BUCKET',
           'AWS_ACCESS_KEY_ID',
           'AWS_SECRET_ACCESS_KEY',
-          'AWS_REGION'
+          'AWS_REGION',
+          'AZURE_STORAGE_ACCOUNT',
+          'AZURE_STORAGE_KEY',
+          'AZURE_STORAGE_CONTAINER_NAME'
         ]
       },
       actionManifestConfig: {
@@ -60,9 +62,9 @@ class AssetComputeGenerator extends ActionGenerator {
     const packagejsonContent = this.fs.readJSON(packagejsonPath)
     packagejsonContent.name = this.props.actionName
     if (!packagejsonContent.scripts) packagejsonContent.scripts = {}
-    packagejsonContent.scripts.posttest = 'eslint ./'
     packagejsonContent.scripts.test = 'aio asset-compute test-worker'
-    packagejsonContent.scripts.deploy = 'aio app deploy && aio asset-compute devtool'
+    // packagejsonContent.scripts.deploy = 'aio app deploy' // deploy only
+    packagejsonContent.scripts.debug = 'aio app run && aio asset-compute devtool'
     // remove e2e test script and jest dependency
     delete packagejsonContent.scripts.e2e
     delete packagejsonContent.devDependencies.jest

@@ -68,13 +68,15 @@ function assertManifestContent (actionName) {
 }
 
 function assertEnvContent (prevContent) {
-  assert.fileContent('.env', `## please provide the following environment variables for the Asset Compute devtool
-# AIO_INTEGRATION_FILE_PATH=
-# ASSET_COMPUTE_URL=
+  assert.fileContent('.env', `## please provide the following environment variables for the Asset Compute devtool. You can use AWS or Azure, not both:
+# ASSET_COMPUTE_INTEGRATION_FILE_PATH=
 # S3_BUCKET=
 # AWS_ACCESS_KEY_ID=
 # AWS_SECRET_ACCESS_KEY=
-# AWS_REGION=`)
+# AWS_REGION=
+# AZURE_STORAGE_ACCOUNT=
+# AZURE_STORAGE_KEY=
+# AZURE_STORAGE_CONTAINER_NAME=`)
   assert.fileContent('.env', prevContent)
 }
 
@@ -95,16 +97,15 @@ function assertDependencies (actionName) {
   expect(JSON.parse(fs.readFileSync('package.json').toString())).toEqual({
     name: actionName,
     scripts: {
-      deploy: 'aio app deploy && aio asset-compute devtool',
-      posttest: 'eslint ./',
-      test: 'aio asset-compute test-worker'
+      test: 'aio asset-compute test-worker',
+      debug: 'aio app run && aio asset-compute devtool'
     },
     dependencies: {
       '@adobe/asset-compute-sdk': expect.any(String)
     },
     devDependencies: {
       '@adobe/wskdebug': expect.any(String),
-      '@adobe/eslint-config-asset-compute': expect.any(String)
+      '@adobe/aio-cli-plugin-asset-compute': expect.any(String)
     }
   })
 }
@@ -176,16 +177,16 @@ describe('run', () => {
     assertDependencies(actionName)
   })
 
-  test('asset-compute: user input actionName=yolo', async () => {
+  test('asset-compute: user input actionName=new-action', async () => {
     const prevDotEnvContent = 'PREVIOUSCONTENT\n'
     await helpers.run(theGeneratorPath)
       .withOptions({ 'skip-prompt': false })
-      .withPrompts({ actionName: 'yolo' })
+      .withPrompts({ actionName: 'new-asset-compute-action' })
       .inTmpDir(dir => {
         fs.writeFileSync(path.join(dir, '.env'), prevDotEnvContent)
       })
 
-    const actionName = 'yolo'
+    const actionName = 'new-asset-compute-action'
 
     assertGeneratedFiles(actionName)
     assertActionCodeContent(actionName)
